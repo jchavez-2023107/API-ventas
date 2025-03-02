@@ -126,7 +126,7 @@ export const agregarCategoriasPorDefecto = async () => {
     const categoriasPorDefecto = [
       {
         name: "Default",
-        description: "Categoría para artículos de cocina",
+        description: "Categoría para guardar productos sin categoría :(",
       },
       {
         name: "Electrónica",
