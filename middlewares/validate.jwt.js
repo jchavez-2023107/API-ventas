@@ -23,9 +23,7 @@ export const validateJWT = async (req, res, next) => {
     // Cargar el usuario de la base de datos para obtener el valor actual de updateAt
     const user = await User.findById(decoded.uid);
     if (!user) {
-      return res
-        .status(401)
-        .json({ message: "Unauthorized - User not found" });
+      return res.status(401).json({ message: "Unauthorized - User not found" });
     }
 
     // Comparar tokenVersion del token con el timestamp actual de updateAt del usuario
@@ -40,11 +38,20 @@ export const validateJWT = async (req, res, next) => {
     req.user = {
       id: decoded.uid,
       username: decoded.username,
+      role: decoded.role,
     };
 
     next();
   } catch (err) {
     console.error("❌ JWT Error:", err);
-    return res.status(401).json({ message: "Invalid credentials" });
+
+    // Si el token ha expirado, devolver un mensaje claro
+    if (err.name === "TokenExpiredError") {
+      return res
+        .status(401)
+        .json({ message: "Token expired. Please log in again." });
+    }
+
+    return res.status(401).json({ message: "Invalid token" });
   }
 };
