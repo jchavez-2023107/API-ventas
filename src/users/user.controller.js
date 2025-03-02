@@ -98,8 +98,7 @@ export const getUserProfile = async (req, res) => {
 export const updateUserProfile = async (req, res) => {
   try {
     // Extraemos los campos a actualizar, incluyendo username y email
-    const { name, surname, username, email, phone, preferences } =
-      req.body;
+    const { name, surname, username, email, phone, preferences } = req.body;
 
     // Obtenemos el usuario actual desde la base de datos
     const currentUser = await User.findById(req.user.id);
@@ -214,6 +213,30 @@ export const deleteUser = async (req, res) => {
       .json({ message: "Error deleting account", error: error.message });
   }
 };
+
+/**
+ * 📌 Obtener todos los usuarios desactivados (soft-deleted)
+ */
+export const getDisabledUsers = async (req, res) => {
+    try {
+      // Buscamos a todos los usuarios con active = false
+      const disabledUsers = await User.find({ active: false });
+      
+      // Puedes devolver 404 si no encuentras ninguno (opcional)
+      if (!disabledUsers || disabledUsers.length === 0) {
+        return res.status(404).json({ message: "No disabled users found" });
+      }
+  
+      res.status(200).json({ message: "Usuarios encontrados: ", disabledUsers });
+    } catch (error) {
+      console.error("❌ Error in getDisabledUsers:", error);
+      res
+        .status(500)
+        .json({ message: "Error retrieving disabled users", error: error.message });
+    }
+  };
+  
+
 
 /* ───────── CRUD para usuarios gestionados por ADMIN ───────── */
 
@@ -475,7 +498,9 @@ export const agregarUsuariosPorDefecto = async () => {
         },
       ];
       await User.insertMany(usuariosPorDefecto);
-      console.log("Usuarios por defecto agregados");
+      console.log("✅ Usuarios por defecto agregados");
+    } else {
+        console.log("ℹ️ Ya existen usuarios en la base de datos, no se crearon usuarios por defecto");  
     }
   } catch (error) {
     console.error("Error al agregar usuarios por defecto:", error);

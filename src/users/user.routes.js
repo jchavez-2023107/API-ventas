@@ -5,6 +5,7 @@ import {
   getUserProfile,
   updateUserProfile,
   deleteUser,
+  getDisabledUsers,
   createUserByAdmin,
   getAllUsers,
   getUserById,
@@ -22,8 +23,8 @@ const api = Router();
 /**
  * Registro y Login
  */
-api.post("/register", registerUser);
-api.post("/login", loginUser);
+api.post("/auth/register", registerUser);
+api.post("/auth/login", loginUser);
 
 /* ────────────── ENDPOINTS DE USUARIO (Self) ────────────── */
 /**
@@ -55,12 +56,22 @@ api.use("/users", validateJWT, authorizeRoles("ADMIN_ROLE"));
 /**
  * Crear un nuevo usuario (ADMIN o CLIENT) mediante POST.
  */
-api.post("/", validateJWT, authorizeRoles("ADMIN_ROLE"), createUserByAdmin);
+api.post(
+  "/createuser",
+  validateJWT,
+  authorizeRoles("ADMIN_ROLE"),
+  createUserByAdmin
+);
 
 /**
  * Listar todos los usuarios.
  */
 api.get("/", validateJWT, authorizeRoles("ADMIN_ROLE"), getAllUsers);
+
+/*
+ * Listar Usuarios eliminados
+ */
+api.get("/deleted", validateJWT, authorizeRoles("ADMIN_ROLE"), getDisabledUsers);
 
 /**
  * Buscar usuario por ID
@@ -76,7 +87,7 @@ api.put("/:id", validateJWT, authorizeRoles("ADMIN_ROLE"), updateUserByAdmin);
  * Eliminar usuario por ID
  */
 api.delete(
-  "/:id",
+  "/deleteuser/:id",
   validateJWT,
   authorizeRoles("ADMIN_ROLE"),
   deleteUserByAdmin
