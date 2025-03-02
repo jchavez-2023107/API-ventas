@@ -1,0 +1,27 @@
+{
+  "name": "api_ventas",
+  "version": "1.0.0",
+  "description": "API para gestión de ventas",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node --watch index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jchavez-2023107/API-ventas.git"
+  },
+  "keywords": [
+    "API",
+    "api",
+    "gestión",
+    "ventas",
+    "online"
+  ],
+  "author": "JC (Joel Chávez)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jchavez-2023107/API-ventas/issues"
+  },
+  "homepage": "https://github.com/jchavez-2023107/API-ventas#readme"
+}
