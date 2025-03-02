@@ -91,10 +91,10 @@ export const deleteCategory = async (req, res) => {
     // Buscar categoría 'Default' o la que decidas
     const defaultCategory = await Category.findOne({ name: "Default" });
     if (!defaultCategory) {
-      return res.status(400).json({ message: "Default category not found" });
+      return res.status(400).json({ message: "Default category not found. Please create one." });
     }
 
-    // Mover productos a la categoría Default
+    // Actualizar todos los productos de la categoría a eliminar para que queden en la Default
     await Product.updateMany(
       { category: id },
       { category: defaultCategory._id }
