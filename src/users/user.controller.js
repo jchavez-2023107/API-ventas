@@ -202,9 +202,12 @@ export const deleteUser = async (req, res) => {
       },
     });
 
+    // Mover el usuario: lo eliminamos de la colección users
+    await User.findByIdAndDelete(req.user.id);
+
     res.status(200).json({
       message: "User account disabled successfully",
-      user: updatedUser,
+      archivedUser: updatedUser,
     });
   } catch (error) {
     console.error("❌ Error in deleteUser:", error);
@@ -215,27 +218,23 @@ export const deleteUser = async (req, res) => {
 };
 
 /**
- * 📌 Obtener todos los usuarios desactivados (soft-deleted)
+ * Obtener todos los usuarios desactivados (soft-deleted)
  */
 export const getDisabledUsers = async (req, res) => {
-    try {
-      // Buscamos a todos los usuarios con active = false
-      const disabledUsers = await User.find({ active: false });
-      
-      // Puedes devolver 404 si no encuentras ninguno (opcional)
-      if (!disabledUsers || disabledUsers.length === 0) {
-        return res.status(404).json({ message: "No disabled users found" });
-      }
-  
-      res.status(200).json({ message: "Usuarios encontrados: ", disabledUsers });
-    } catch (error) {
-      console.error("❌ Error in getDisabledUsers:", error);
-      res
-        .status(500)
-        .json({ message: "Error retrieving disabled users", error: error.message });
+  try {
+    // Filtrar por usuarios que hayan sido deshabilitados (active:false y deletedAt establecido)
+    const disabledUsers = await User.find({ active: false, deletedAt: { $ne: null } });
+    
+    if (!disabledUsers || disabledUsers.length === 0) {
+      return res.status(404).json({ message: "No disabled users found" });
     }
-  };
-  
+
+    res.status(200).json({ message: "Usuarios encontrados:", disabledUsers });
+  } catch (error) {
+    console.error("❌ Error in getDisabledUsers:", error);
+    res.status(500).json({ message: "Error retrieving disabled users", error: error.message });
+  }
+};
 
 
 /* ───────── CRUD para usuarios gestionados por ADMIN ───────── */
@@ -371,50 +370,37 @@ export const deleteUserByAdmin = async (req, res) => {
         .status(403)
         .json({ message: "Admins cannot delete their own accounts" });
     }
-    const deletedUser = await User.findByIdAndDelete(id);
-    if (!deletedUser)
+
+    // Realizamos un soft delete: actualizamos al usuario para marcarlo como inactivo
+    const disabledUser = await User.findByIdAndUpdate(
+      id, 
+      { active: false, deletedAt: Date.now() },
+      { new: true }
+    );
+
+    if(!disabledUser)
       return res.status(404).json({ message: "User not found" });
-    res.status(200).json({ message: "User deleted successfully" });
+
+    // Registrar en AuditLog la acción de eliminación
+    const ipAddress = req.ip || req.headers["x-forwarded-for"] || "Unknown IP";
+    await AuditLog.create({
+      user: req.user.id,
+      action: "Account Deletion Request (Soft Delete) - by Admin",
+      ip: ipAddress,
+      details: {
+        message: "User account disabled by admin instead of permanent deletion.",
+      },
+    });
+    
+    res.status(200).json({ message: "User disabled successfully", user: disabledUser });
+
   } catch (error) {
     console.error("❌ Error in deleteUserByAdmin:", error);
     res
       .status(500)
-      .json({ message: "Error deleting user", error: error.message });
+      .json({ message: "Error disabling user", error: error.message });
   }
 };
-
-/**
- * Actualizar rol de usuario (por Admin)
- */
-//Probé pero hay algo que no me permite realizar la solicitud, entonces por el momento la dejaremos de lado.
-/* export const updateUserRole = async (req, res) => {
-  try {
-    const { userId, newRole } = req.body;
-    if (req.user.id === userId) {
-      return res
-        .status(403)
-        .json({ message: "Admins cannot update their own role" });
-    }
-    if (newRole !== "ADMIN_ROLE" && newRole !== "CLIENT_ROLE") {
-      return res.status(400).json({ message: "Invalid role" });
-    }
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { role: newRole },
-      { new: true }
-    ).select("-password");
-    if (!updatedUser)
-      return res.status(404).json({ message: "User not found" });
-    res
-      .status(200)
-      .json({ message: "User role updated successfully", user: updatedUser });
-  } catch (error) {
-    console.error("❌ Error in updateUserRole:", error);
-    res
-      .status(500)
-      .json({ message: "Error updating user role", error: error.message });
-  }
-}; */
 
 /**
  * Obtener historial de compras del usuario (CLIENT)
@@ -500,7 +486,9 @@ export const agregarUsuariosPorDefecto = async () => {
       await User.insertMany(usuariosPorDefecto);
       console.log("✅ Usuarios por defecto agregados");
     } else {
-        console.log("ℹ️ Ya existen usuarios en la base de datos, no se crearon usuarios por defecto");  
+      console.log(
+        "ℹ️ Ya existen usuarios en la base de datos, no se crearon usuarios por defecto"
+      );
     }
   } catch (error) {
     console.error("Error al agregar usuarios por defecto:", error);
