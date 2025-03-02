@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 dotenv.config(); // Cargar variables de entorno desde .env
 
 import { connectDB } from "./configs/mongo.js"; // Conexión a la base de datos
-import { agregarUsuariosPorDefecto } from "./src/usuarios/usuarios.model"
+import { agregarUsuariosPorDefecto } from "./src/users/user.controller.js";
 import { initServer } from "./configs/app.js"; // Inicialización del servidor Express
 
 // Iniciar conexión a MongoDB
