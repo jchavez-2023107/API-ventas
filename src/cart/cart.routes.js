@@ -17,33 +17,33 @@ api.use(validateJWT);
  * GET /api/cart
  * Obtener el carrito del usuario autenticado.
  */
-api.get("/", getCart);
+api.get("/", validateJWT, getCart);
 
 /**
  * POST /api/cart
  * Agregar un ítem al carrito.
  * Body esperado: { "productId": "<id>", "quantity": <number> }
  */
-api.post("/", addItemToCart);
+api.post("/", validateJWT, addItemToCart);
 
 /**
  * PUT /api/cart
  * Actualizar la cantidad de un ítem en el carrito.
  * Body esperado: { "productId": "<id>", "quantity": <number> }
  */
-api.put("/", updateItemQuantity);
+api.put("/", validateJWT, updateItemQuantity);
 
 /**
  * DELETE /api/cart
  * Eliminar un ítem del carrito.
  * Body esperado: { "productId": "<id>" }
  */
-api.delete("/", removeItemFromCart);
+api.delete("/", validateJWT, removeItemFromCart);
 
 /**
  * DELETE /api/cart/clear
  * Vaciar el carrito completamente.
  */
-api.delete("/clear", clearCart);
+api.delete("/clear", validateJWT, clearCart);
 
 export default api;

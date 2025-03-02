@@ -31,15 +31,15 @@ api.post("/auth/login", loginUser);
  * Perfil del usuario autenticado: GET, PUT y DELETE
  */
 api.use("/profile", validateJWT);
-api.get("/profile", getUserProfile);
-api.put("/profile", updateUserProfile);
-api.delete("/profile", deleteUser);
+api.get("/profile", validateJWT, getUserProfile);
+api.put("/profile", validateJWT, updateUserProfile);
+api.delete("/profile", validateJWT, deleteUser);
 
 /**
  * Actualizar Contraseña (Self)
  * Endpoint especial que requiere que se envíen currentPassword y newPassword.
  */
-api.put("/profile/password", updatePasswordValidator, updatePassword);
+api.put("/profile/password", validateJWT, updatePasswordValidator, updatePassword);
 
 /**
  * Historial de Compras (CLIENT)
