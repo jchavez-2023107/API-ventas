@@ -71,7 +71,14 @@ api.get("/", validateJWT, authorizeRoles("ADMIN_ROLE"), getAllUsers);
 /*
  * Listar Usuarios eliminados
  */
-api.get("/deleted", validateJWT, authorizeRoles("ADMIN_ROLE"), getDisabledUsers);
+
+api.get(
+  "/deleted",
+  validateJWT,
+  authorizeRoles("ADMIN_ROLE"),
+  getDisabledUsers
+);
+
 
 /**
  * Buscar usuario por ID
