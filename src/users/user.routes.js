@@ -44,8 +44,12 @@ api.put("/profile/password", updatePasswordValidator, updatePassword);
 /**
  * Historial de Compras (CLIENT)
  */
-api.use("/invoices", validateJWT, authorizeRoles("CLIENT_ROLE"));
-api.get("/invoices", validateJWT, getUserInvoices);
+api.get(
+  "/invoices",
+  validateJWT,
+  authorizeRoles("CLIENT_ROLE"),
+  getUserInvoices
+);
 
 /* ────────────── CRUD ADMIN DE USUARIOS ────────────── */
 /**
@@ -78,7 +82,6 @@ api.get(
   authorizeRoles("ADMIN_ROLE"),
   getDisabledUsers
 );
-
 
 /**
  * Buscar usuario por ID

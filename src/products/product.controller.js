@@ -30,7 +30,21 @@ export const createProduct = async (req, res) => {
  */
 export const getProducts = async (req, res) => {
   try {
-    const products = await Product.find().populate("category");
+    // Se puede enviar por el query: ?name=algo&category=<id_categoria>
+    const { name, category } = req.query;
+    const filter = {};
+
+    if (name) {
+      // Búsqueda parcial, case-insensitive
+      filter.name = { $regex: name, $options: "i" };
+    }
+
+    if (category) {
+      // Filtra por el ID de la categoría
+      filter.category = category;
+    }
+
+    const products = await Product.find(filter).populate("category");
     res.status(200).json({ products });
   } catch (error) {
     console.error("❌ Error in getProducts:", error);
