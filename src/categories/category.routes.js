@@ -5,7 +5,7 @@ import {
   getCategoryById,
   updateCategory,
   deleteCategory
-} from "../controllers/category.controller.js";
+} from "./category.controller.js";
 import { validateJWT } from "../../middlewares/validate.jwt.js";
 import { authorizeRoles } from "../../middlewares/authorize.roles.js";
 

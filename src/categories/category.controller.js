@@ -2,7 +2,7 @@ import Category from "./category.model.js";
 import Product from "../products/product.model.js";
 
 /**
- * 📌 Crear nueva categoría (Solo ADMIN)
+ * Crear nueva categoría (Solo ADMIN)
  */
 export const createCategory = async (req, res) => {
   try {
@@ -25,7 +25,7 @@ export const createCategory = async (req, res) => {
 };
 
 /**
- * 📌 Obtener todas las categorías (público)
+ * Obtener todas las categorías (público)
  */
 export const getCategories = async (req, res) => {
   try {
@@ -40,7 +40,7 @@ export const getCategories = async (req, res) => {
 };
 
 /**
- * 📌 Obtener categoría por ID (público)
+ * Obtener categoría por ID (público)
  */
 export const getCategoryById = async (req, res) => {
   try {
@@ -58,7 +58,7 @@ export const getCategoryById = async (req, res) => {
 };
 
 /**
- * 📌 Actualizar categoría (Solo ADMIN)
+ * Actualizar categoría (Solo ADMIN)
  */
 export const updateCategory = async (req, res) => {
   try {
@@ -83,7 +83,7 @@ export const updateCategory = async (req, res) => {
 };
 
 /**
- * 📌 Eliminar categoría (Solo ADMIN)
+ * Eliminar categoría (Solo ADMIN)
  */
 export const deleteCategory = async (req, res) => {
   try {
@@ -106,11 +106,9 @@ export const deleteCategory = async (req, res) => {
       return res.status(404).json({ message: "Category not found" });
     }
 
-    res
-      .status(200)
-      .json({
-        message: "Category deleted and products moved to default category",
-      });
+    res.status(200).json({
+      message: "Category deleted and products moved to default category",
+    });
   } catch (error) {
     console.error("❌ Error in deleteCategory:", error);
     res
@@ -120,9 +118,9 @@ export const deleteCategory = async (req, res) => {
 };
 
 /**
- * 📌 Agregar categorías por defecto (con descripción)
+ * Agregar categorías por defecto (con descripción)
  */
-const agregarCategoriasPorDefecto = async () => {
+export const agregarCategoriasPorDefecto = async () => {
   const categoriasExistentes = await Category.countDocuments();
   if (categoriasExistentes === 0) {
     const categoriasPorDefecto = [
@@ -131,17 +129,20 @@ const agregarCategoriasPorDefecto = async () => {
         description: "Categoría para artículos de cocina",
       },
       {
-        name: "Baño",
-        description: "Categoría para artículos de baño",
+        name: "Electrónica",
+        description: "Categoría para artículos de electrónica",
       },
     ];
 
     try {
       await Category.insertMany(categoriasPorDefecto);
-      console.log("Categorías por defecto agregadas");
+      console.log("✅ Categorías por defecto agregadas");
     } catch (error) {
       console.error("Error al agregar categorías por defecto: ", error);
     }
+  } else {
+    console.log(
+      "ℹ️ Ya existen categorías en la base de datos, no se crearon categorías por defecto"
+    );
   }
 };
-agregarCategoriasPorDefecto();
